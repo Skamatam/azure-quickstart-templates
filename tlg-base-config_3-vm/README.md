@@ -14,8 +14,10 @@ The **tlg-base-config_3-vm** solution provisions a Windows Server 2012 R2 Active
 an application server running Windows Server 2012 R2, and optionally a client VM running Windows 10. 
 
 **Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name. 
-This is because the Windows 10 gallery image is only available in eligible subscriptions (Visual Studio or MSDN). The path to the VHD should be 
-*https://\<storage account name\>.blob.core.windows.net/vhds/\<vhdName\>.VHD*.
+This is because the Windows 10 gallery image is only available in eligible subscriptions (Visual Studio or MSDN). The path to the VHD should be
+like the following:
+
+     https://<storage account name>.blob.core.windows.net/vhds/<vhdName>.VHD
 * For more information about eligible subscriptions, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/client-images#subscription-eligibility.
 * For more information about how to prepare a generalized VHD, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/prepare-for-upload-vhd-image.
 
