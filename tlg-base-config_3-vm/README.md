@@ -12,6 +12,7 @@ to the Internet. This base configuration is the starting point for additional TL
 
 The **tlg-base-config_3-vm** solution provisions a Windows Server 2012 R2 Active Directory domain controller using the specified domain name, 
 an application server running Windows Server 2012 R2, and optionally a client VM running Windows 10. 
+
 **Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name. This is because the Windows 10 gallery image is only available in eligible subscriptions (Visual Studio or MSDN). 
 * For more information about eligible subscriptions, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/client-images#subscription-eligibility.
 * For more information about how to prepare a generalized VHD, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/prepare-for-upload-vhd-image.
