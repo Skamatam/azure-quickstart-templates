@@ -13,7 +13,7 @@ to the Internet. This base configuration is the starting point for additional TL
 The **tlg-base-config_3-vm** solution provisions a Windows Server 2012 R2 Active Directory domain controller using the specified domain name, 
 an application server running Windows Server 2012 R2, and optionally a client VM running Windows 10. 
 
-**Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name. 
+**Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name and SAS token. 
 This is because the Windows 10 gallery image is only available in eligible subscriptions (Visual Studio or MSDN). The path to the VHD should be
 like the following:
 
@@ -51,3 +51,8 @@ the JoinDomain extensions. The asymmetric VM deployment adds a few minutes to th
 * Deployment outputs include public IP address and FQDN for each VM.
 
 `Tags: TLG, Test Lab Guide, Base Configuration`
+
+Developed by the **MAX Skunkworks Lab**
+https://github.com/maxskunkworks
+
+![alt text](images/maxskunkworkslogo-small.jpg "MAX Skunkworks")
