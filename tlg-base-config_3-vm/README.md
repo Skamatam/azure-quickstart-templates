@@ -51,8 +51,9 @@ the JoinDomain extensions. The asymmetric VM deployment adds a few minutes to th
 * Deployment outputs include public IP address and FQDN for each VM.
 
 `Tags: TLG, Test Lab Guide, Base Configuration`
-
-Developed by the **MAX Skunkworks Lab**
+___
+Developed by the **MAX Skunkworks Lab**  
+Author: Kelley Vice (kvice@microsoft.com)  
 https://github.com/maxskunkworks
 
 ![alt text](images/maxskunkworkslogo-small.jpg "MAX Skunkworks")
