@@ -2,48 +2,34 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "appVMName": {
+    "SharedVmConfig": {
+      "type": "object"
+    },
+    "vmName": {
       "type": "string"
     },
-    "location": {
-      "type": "string"
-    },
-    "domainUserName": {
-      "type": "string"
-    },
-    "adminUserName": {
-      "type": "string"
-    },
-    "adminPassword": {
-      "type": "securestring"
-    },
-    "appVMSize": {
-      "type": "string"
-    },
-    "appNicName": {
-      "type": "string"
-    },
-    "storageAccountNamePrefix": {
-      "type": "string"
-    },
-    "domainName": {
+    "nicName": {
       "type": "string"
     }
+  },
+  "variables": {
+    "OSDiskName": "[concat(parameters('vmName'),'-os')]",
+    "dataDiskName": "[concat(parameters('vmName'),'-data')]"
   },
   "resources": [
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('appVMName')]",
-      "location": "[parameters('location')]",
+      "name": "[parameters('vmName')]",
+      "location": "[parameters('SharedVmConfig').location]",
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[parameters('appVMSize')]"
+          "vmSize": "[parameters('SharedVmConfig').vmSize]"
         },
         "osProfile": {
-          "computerName": "[parameters('appVMName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('SharedVmConfig').adminUsername]",
+          "adminPassword": "[parameters('SharedVmConfig').adminPassword]"
         },
         "storageProfile": {
           "imageReference": {
@@ -53,9 +39,9 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "osdisk",
+            "name": "[variables('OSDiskName')]",
             "vhd": {
-              "uri": "[concat('http://',parameters('storageAccountNamePrefix'),'vhds.blob.core.windows.net/vhds/',parameters('appVMName'),'-osdisk.vhd')]"
+              "uri": "[concat('http://',parameters('SharedVmConfig').storageAccountNamePrefix,'.blob.core.windows.net/vhds/',parameters('vmName'),variables('OSDiskName'),'.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -63,9 +49,9 @@
           "dataDisks": [
             {
               "vhd": {
-                "uri": "[concat('http://',parameters('storageAccountNamePrefix'),'vhds.blob.core.windows.net/vhds/',parameters('appVMName'),'-data-disk1.vhd')]"
+                "uri": "[concat('http://',parameters('SharedVmConfig').storageAccountNamePrefix,'.blob.core.windows.net/vhds/',parameters('vmName'),variables('dataDiskName'),'.vhd')]"
               },
-              "name": "[concat(parameters('appVMName'),'-data-disk1')]",
+              "name": "[variables('dataDiskName')]",
               "createOption": "Empty",
               "caching": "None",
               "diskSizeGB": "1000",
@@ -76,23 +62,23 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('appNicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
             }
           ]
         },
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
-            "storageUri": "[concat('http://',parameters('storageAccountNamePrefix'),'diag.blob.core.windows.net')]"
+            "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/',parameters('SharedVmConfig').storageAccountNamePrefix),'2017-06-01').primaryEndpoints.blob]"
           }
         }
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('appVMName'),'/JoinDomain')]",
-      "location": "[resourceGroup().location]",
+      "name": "[concat(parameters('vmName'),'/JoinDomain')]",
+      "location": "[parameters('SharedVmConfig').location]",
       "tags": {
         "displayName": "Join Domain"
       },
@@ -102,29 +88,29 @@
         "typeHandlerVersion": "1.3",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "Name": "[parameters('domainName')]",
+          "Name": "[parameters('SharedVmConfig').domainName]",
           "OUPath": null,
           "Options": "3",
           "Restart": "true",
-          "User": "[parameters('domainUserName')]"
+          "User": "[parameters('SharedVmConfig').domainUserName]"
         },
         "protectedsettings": {
-          "Password": "[parameters('adminPassword')]"
+          "Password": "[parameters('SharedVmConfig').adminPassword]"
         }
       },
       "dependsOn": [
-        "[parameters('appVMName')]"
+        "[parameters('vmName')]"
       ]
     },
     {
 
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('appVMName'),'/BGInfo')]",
-      "apiVersion": "2015-06-15",
+      "name": "[concat(parameters('vmName'),'/BGInfo')]",
+      "apiVersion": "2017-03-30",
       "scale": null,
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('SharedVmConfig').location]",
       "dependsOn": [
-        "[parameters('appVMName')]"
+        "[parameters('vmName')]"
       ],
       "properties": {
 
@@ -141,11 +127,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('appVMName'),'/Antimalware')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
+      "name": "[concat(parameters('vmName'),'/Antimalware')]",
+      "apiVersion": "2017-03-30",
+      "location": "[parameters('SharedVmConfig').location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('appVMName'))]"
+        "[parameters('vmName')]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Security",
