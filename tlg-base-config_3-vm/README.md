@@ -13,11 +13,11 @@ to the Internet. This base configuration is the starting point for additional TL
 The **TLG (Test Lab Guide) 3 VM Base Configuration** provisions a Windows Server 2012 R2 Active Directory domain controller using the specified domain name, 
 an application server running Windows Server 2012 R2, and optionally a client VM running Windows 10. 
 
-**Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name and SAS token. 
+**Note:** If you choose to deploy a client VM, you must upload a generalized Windows 10 VHD to an Azure storage account and provide the account name and SAS token in the _clientVhdUri_ parameter. 
 This is because the Windows 10 gallery image is only available in eligible subscriptions (Visual Studio or MSDN). The path to the VHD should be
 like the following:
 
-     https://<storage account name>.blob.core.windows.net/vhds/<vhdName>.VHD
+     https://<storage account name>.blob.core.windows.net/vhds/<vhdName>.VHD<SAS token>
 * For more information about eligible subscriptions, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/client-images#subscription-eligibility.
 * For more information about how to prepare a generalized VHD, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/prepare-for-upload-vhd-image.
 
@@ -37,7 +37,6 @@ The following resources are deployed as part of the solution:
 + **Virtual network**: Virtual network for internal traffic, configured with custom DNS pointing to the ADDC's private IP address
 + **Network interfaces**: 1 NIC per VM
 + **Public IP addresses**: 1 public IP per VM
-+ **Storage accounts**: 2 storage accounts for VHDs and diagnostics respectively
 + **JoinDomain**: Each member VM uses the **JsonADDomainExtension** extension to join the domain.
 + **BGInfo**: The **BGInfo** extension is applied to all VMs.
 + **Antimalware**: The **iaaSAntimalware** extension is applied to all VMs with basic scheduled scan and exclusion settings.

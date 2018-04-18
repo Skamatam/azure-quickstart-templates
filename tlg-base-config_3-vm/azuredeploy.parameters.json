@@ -21,13 +21,10 @@
       "value": "GEN-UNIQUE-13"
     },
     "deployClientVm": {
-      "value": "No"
+      "value": "Yes"
     },
     "clientVhdUri": {
       "value": "GEN-GENERALIZED-WINVHD-URI"
-    },
-    "clientVhdUriSasToken": {
-      "value": "GEN-UNIQUE"
     }
   }
 }

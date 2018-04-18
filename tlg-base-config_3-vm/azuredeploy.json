@@ -7,14 +7,14 @@
       "metadata": {
         "description": "The name of the deployment, i.e. BaseConfig01. Do not use spaces or special characters other than _ or -. Used to concatenate resource names for the deployment."
       },
-      "defaultValue": ""
+      "defaultValue": "TlgBaseConfig-01"
     },
     "domainName": {
       "type": "string",
       "metadata": {
         "description": "The FQDN of the new AD domain."
       },
-      "defaultValue": ""
+      "defaultValue": "corp.contoso.com"
     },
     "adminUsername": {
       "type": "string",
@@ -36,19 +36,12 @@
       "metadata": {
         "description": "Choose 'No' to deploy no client VM, or 'Yes' if you want to deploy a client VM from a custom generalized VHD that you have uploaded to an accessible storage account."
       },
-      "defaultValue": "No"
+      "defaultValue": "Yes"
     },
     "clientVhdUri": {
       "type": "string",
       "metadata": {
-        "description": "The URI of the storage account containing the client VHD. Leave blank if you are not deploying a client VM."
-      },
-      "defaultValue": ""
-    },
-    "clientVhdUriSasToken": {
-      "type": "string",
-      "metadata": {
-        "description": "The SAS token for the storage account containing the client VHD. Leave blank if you are not deploying a client VM."
+        "description": "The URI of the storage account containing the client VHD, including the SAS token if used. Leave blank if you are not deploying a client VM."
       },
       "defaultValue": ""
     },
@@ -57,7 +50,7 @@
       "metadata": {
         "description": "Select a VM size for all server VMs in your deployment. If a client VM is deployed, it will use Standard_D2_v2."
       },
-      "defaultValue": ""
+      "defaultValue": "Standard_DS2_v2"
     },
     "dnsLabelPrefix": {
       "type": "string",
@@ -83,7 +76,6 @@
 
   "variables": {
 
-    "baseVnet": "[concat(parameters('configName'),'-VNET')]",
     "shortDomainName": "[first(split(parameters('domainName'),'.'))]",
     "domainUserName": "[concat(variables('shortDomainName'),'\\',parameters('adminUsername'))]",
     "assetLocation": "[concat(parameters('_artifactsLocation'),'/DSC')]",
@@ -91,8 +83,8 @@
     "storageAccountName": "[concat(uniqueString(resourceGroup().id),'storage')]",
 
     "network": {
-      "vnetName": "[variables('baseVnet')]",
-      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('baseVnet'), 'subnet-01')]",
+      "vnetName": "[concat(parameters('configName'),'-VNET')]",
+      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('configName'),'-VNET'), 'subnet-01')]",
       "subnet": "10.0.0.0/24",
       "nsgName": "[concat(parameters('configName'),'-NSG')]"
     },
@@ -109,7 +101,8 @@
 
       "cliVmName": "CLIENT1",
       "clientNicIP": "10.0.0.12",
-      "cliPublicIpName": "[concat(parameters('configName'),'-CLI_IP')]"
+      "cliPublicIpName": "[concat(parameters('configName'),'-CLI_IP')]",
+      "clientVhdUriSplit": "[split(parameters('clientVhdUri'),'?')]"
     },
 
     "SharedVmConfig": {
@@ -417,10 +410,10 @@
             "value": "[concat(parameters('configName'),'-CLI_NIC')]"
           },
           "vhdUri": {
-            "value": "[parameters('clientVhdUri')]"
+            "value": "[first(variables('VMs').clientVhdUriSplit)]"
           },
           "vhdUriSasToken": {
-            "value": "[parameters('clientVhdUriSasToken')]"
+            "value": "[concat(last(variables('VMs').clientVhdUriSplit),'?')]"
           }
         }
       }
